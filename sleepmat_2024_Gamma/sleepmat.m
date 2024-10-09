@@ -4624,7 +4624,7 @@ end
 % ***************************** anticipation screening plot Begins ***************************************************************************
 
 try
-
+screen_data_anticipation_MA.MA;
 FigName   = 'Morning_anticipation';
 figure('NumberTitle', 'off', 'Name',FigName);
 plot(screen_data_anticipation_MA.MA, '.', 'MarkerSize',20)
@@ -4678,6 +4678,7 @@ end
 % ***************************** periodogram screening plot Begins ***************************************************************************
 
 try
+screen_data_period_T_P_S.P_S;
 FigName   = 'P-S';
 figure('NumberTitle', 'off', 'Name',FigName);
 plot(screen_data_period_T_P_S.P_S, '.', 'MarkerSize',20)
