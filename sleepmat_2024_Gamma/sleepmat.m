@@ -442,7 +442,7 @@ end
 function Start_Callback(hObject, eventdata, handles)
 
 
-try
+ try
 
 oldmsgs = cellstr(get(handles.M_box,'String'));
 
@@ -1566,8 +1566,6 @@ cum_sleep_loss(SDL_data1,SDL_data2,SDG_data1,SDG_data2,N_ch,geno_type,Triaged_ma
 
 %% Saving and closing cumulative sleep
 %try
-
-%Figures = findobj( 'Type', 'Figure' , '-not' , 'Tag' , get( handles.output , 'Tag' ) );
 path = handles.path;
 myfolder = 'Cumulative_sleep' ;   % new folder name 
 folder = mkdir([path,Project_name,filesep,myfolder]);
@@ -3502,10 +3500,17 @@ Data_seg_actogram=X_fly_Raw.data(Starting_time_actogram_min:end,end-32+N_ch_star
         end
  
         path = handles.path;   % mention your path 
+myfolder = [path,Project_name,filesep,'Actogram'] ;   % new folder name 
+
+if ~exist(myfolder, 'dir')
+
+mkdir(myfolder);
+end
+
 try      
 for i_nch=1:N_ch
        
-     sleepmat_actogram(Data_seg_actogram, i_nch,N_days_actogram, geno_type,t_Lon,Monitor_number,row_header(i_nch))
+     sleepmat_actogram(Data_seg_actogram, i_nch,N_days_actogram, geno_type,t_Lon,Monitor_number,row_header(i_nch),myfolder)
 end
 catch
   disp('Warning! Check actogram input')  
@@ -3523,48 +3528,6 @@ disp('*****************************************************')
 end
 
 
-
-
-%% Saving and closing actogram
-try
-
-Figures = findobj( 'Type', 'Figure' , '-not' , 'Tag' , get( handles.output , 'Tag' ) );
-NFigures = length( Figures );
-myfolder = 'Actogram' ;   % new folder name 
-folder = mkdir([path,Project_name,filesep,myfolder]);
-path  = [path,Project_name,filesep,myfolder] ;
-
-
-
-     for k = 1:NFigures    
-
-       % FigHandle=Figures(k);
-        FigHandle=figure(k);
-        FigName   = get(FigHandle, 'Name');
-        temp1=[path,filesep,FigName,'.png'];
-                try
-        saveas(gca,temp1); 
-        catch
-            disp("Error!! Please check genotype name. Don't use backslash '\' or '>' other special characters for genotype naming if you need figures")
-                            set(handles.M_box,'String',[oldmsgs;{"Error!! Please check genotype name.  Don't use backslash '\' or '>' for genotype naming if you need figures"}] );drawnow
-
-                            return
-        end
-
-     end
-
-
-
- for nFigures = 1 : NFigures
-  close( Figures( nFigures ) );
- end 
-
-
-end
-%% *********************************** End of actogram**********************************************
-
-
-
 %% ************************************************************************************* %%
 
                    %% Environment Monitor Chart ploting Begins%%
@@ -3574,7 +3537,6 @@ end
 
 try
 
-Figures = findobj( 'Type', 'Figure' , '-not' , 'Tag' , get( handles.output , 'Tag' ) );
 myfolder = 'Environment_condition_plot' ;   % new folder name 
 folder = mkdir([handles.path,Project_name,filesep,myfolder]);% create the new folder
 path_Environment  = [handles.path,Project_name,filesep,myfolder] ; % set this as path
@@ -4515,9 +4477,6 @@ ylabel('sleep Loss (min)');
 set(gca,'XTick',[]);
 
 h=gca;
-%h. XTickLabelRotation=90;
-
-         
          temp1=[path,filesep,FigName,'.png'];
        saveas(gca,temp1); 
        close(FigName);
@@ -5174,7 +5133,8 @@ path1  = [path1,Project_name,filesep,myfolder1] ;
         figure(k);
         temp1=[path1,filesep,GT_name{1},'.png'];
         try
-        saveas(gca,temp1); 
+        saveas(gca,temp1);
+       close(figure(k))
         catch
             disp("Error!! Please check genotype name. Don't use backslash '\' or '>'  for genotype naming if you need periodogram figures")
                             set(handles.M_box,'String',[oldmsgs;{"Error!! Please check genotype name.  Don't use backslash '\' or '>' for genotype naming if you need periodogram figures"}] );drawnow
@@ -5184,17 +5144,6 @@ path1  = [path1,Project_name,filesep,myfolder1] ;
          
  end
 
-Figures = findobj( 'Type', 'Figure' , '-not' , 'Tag' , get( handles.output , 'Tag' ) );
-NFigures = length( Figures );
-
-
-if strcmp(Ed_select2, 'Yes')
-for nFigures = 1 : NFigures;
-  close( Figures( nFigures ) );
-end   
-end
-
-%end
 
  end
 
@@ -5482,6 +5431,7 @@ plot_name={'-plot1', '-plot2'};
         temp=[path,filesep,GT_name{1},p_name,'.png'];
                 try
         saveas(gca,temp); 
+        close( figure(k) );
         catch
             disp("Error!! Please check genotype name. Don't use backslash '\' or '>'  for genotype naming if you need figures")
                             set(handles.M_box,'String',[oldmsgs;{"Error!! Please check genotype name.  Don't use backslash '\' or '>' for genotype naming if you need figures"}] );drawnow
@@ -5490,13 +5440,6 @@ plot_name={'-plot1', '-plot2'};
         end
  end
        
- 
-Figures = findobj( 'Type', 'Figure' , '-not' , 'Tag' , get( handles.output , 'Tag' ) );
-NFigures = length( Figures );
-
-for nFigures = 1 : NFigures;
-  close( Figures( nFigures ) );
-end 
 
 
 end
@@ -5512,8 +5455,8 @@ disp('Analysis COMPLETED! Results exported to xls file')
 set(handles.M_box,'String',[oldmsgs;{'Analysis COMPLETED!'}] );drawnow
 
 catch
-    disp('Unknown Error! Please check the input(eg: genotype specification file, Monitor file, days...)')
-set(handles.M_box,'String',[oldmsgs;{'Unknown Error! Please check the input(eg: genotype specification file, days...)'}] );drawnow
+    disp('Unknown Error! Please check the input(eg: Missing toolbox, genotype specification file, Monitor file, days...)')
+set(handles.M_box,'String',[oldmsgs;{'Unknown Error! Please check the input(eg: Missing toolbox, genotype specification file, days...)'}] );drawnow
 return;
 end
     
@@ -5979,7 +5922,7 @@ SD_sleep_1hr=sleep_matrix_inval';
 
 
 
-function SM_act=sleepmat_actogram(Data_seg_all,i_nch, N_days_actogram, geno_type, t_Lon, Monitor_number, Ch_num)
+function SM_act=sleepmat_actogram(Data_seg_all,i_nch, N_days_actogram, geno_type, t_Lon, Monitor_number, Ch_num,path)
 
 
 % for figure saving
@@ -6039,6 +5982,7 @@ act_max =max(max(Act_data)); % find the maximum value of actogram
 Title_plot=[geno_type, '  ' 'Monitor= ' num2str(Monitor_number) '  '  'Ch= ' num2str(Ch_num)];
 
 
+
  
 if act_max>0% To avoide dead flies
     figure('NumberTitle', 'off', 'Name', Title_plot);
@@ -6052,6 +5996,13 @@ if act_max>0% To avoide dead flies
     end   
      
     set(gca, 'XTick',0:16:96, 'XTickLabel',[x1,x2,x3,x4,x5,x6]);
+
+
+
+    temp1=[path,filesep,Title_plot,'.png'];
+    saveas(gca,temp1); 
+    close(Title_plot);
+
 end
 %title(Title_plot)
     
